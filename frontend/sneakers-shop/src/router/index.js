@@ -2,6 +2,9 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import Login from '../views/Login.vue'
 import Register from '../views/Register.vue'
+import FavoriteView from "@/views/FavoriteView.vue";
+
+
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -21,18 +24,15 @@ const router = createRouter({
             name: 'register',
             component: Register,
         },
+        {
+            path: '/favorites',
+            name: 'favorites',
+            component: FavoriteView,
+            meta: { requiresAuth: true }
+        },
     ],
 })
 
-// 🔐 ЗАЩИТА РОУТОВ (ВОТ ТУТ!)
-router.beforeEach((to, from, next) => {
-    const token = localStorage.getItem('token')
 
-    if (!token && to.name !== 'login' && to.name !== 'register') {
-        next({ name: 'login' })
-    } else {
-        next()
-    }
-})
 
 export default router

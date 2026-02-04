@@ -5,32 +5,34 @@ import Filter from "@/components/Filter.vue"
 import Drawer from "@/components/Drawer.vue"
 import { isCartOpen } from "@/cartDrawer/cartDrawer.js"
 import {useProducts} from "@/assets/js/composables/useProducts.js";
+import {useFavorites} from "@/assets/js/composables/useFavorites.js";
 
 
 // Используем композабл
 const {
-  sneakers,
-  isLoading,
-  currentPage,
-  lastPage,
+
   filters,
-  init,
-  loadProducts,
-  updateFilters,
   handleToggleFavorite,
   handleAddToCart,
   handleChangeQuantity
 } = useProducts()
 
+const {
+  favorites,
+  isLoading,
+  currentPage,
+  lastPage,
+  totalFavorites,
+  init,
+  loadFavorites,
+} = useFavorites()
+
 // Обработчик события из Drawer
 const handleCartUpdated = async () => {
   // Перезагружаем товары после изменений в корзине
-  await loadProducts(currentPage.value)
+  await loadFavorites(currentPage.value)
 }
-const handleCartFavorite = async () => {
-  // Перезагружаем товары после изменений в корзине
-  await loadProducts(currentPage.value)
-}
+
 // Инициализация
 onMounted(() => {
   init()
@@ -46,16 +48,15 @@ onMounted(() => {
         <div class="flex items-center justify-between mb-8">
           <h2 class="text-3xl font-bold">
             Все кроссовки
-            <span v-if="sneakers.length" class="text-gray-500 text-lg">
-              ({{ sneakers.length }})
+            <span v-if="favorites.length" class="text-gray-500 text-lg">
+              ({{ favorites.length }})
             </span>
           </h2>
 
-          <Filter @update-filters="updateFilters"/>
         </div>
 
         <CardList
-            :sneakers="sneakers"
+            :sneakers="favorites"
             :loading="isLoading"
             @toggle-favorite="handleToggleFavorite"
             @add-to-cart="handleAddToCart"
@@ -65,7 +66,7 @@ onMounted(() => {
         <div class="flex justify-center gap-2 mt-8">
           <button
               :disabled="currentPage === 1"
-              @click="loadProducts(currentPage - 1)"
+              @click="loadFavorites(currentPage - 1)"
               class="px-3 py-1 border rounded cursor-pointer hover:bg-gray-200 focus:outline-none disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
           >
             Назад
@@ -75,7 +76,7 @@ onMounted(() => {
 
           <button
               :disabled="currentPage === lastPage"
-              @click="loadProducts(currentPage + 1)"
+              @click="loadFavorites(currentPage + 1)"
               class="px-3 py-1 border rounded cursor-pointer hover:bg-gray-200 focus:outline-none disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
           >
             Вперед
